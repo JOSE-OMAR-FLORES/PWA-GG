@@ -1,0 +1,268 @@
+/* Service Worker Info Styles */
+
+.sw-info {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.sw-info h3 {
+  margin: 0 0 1.5rem 0;
+  color: #646cff;
+  font-size: 1.25rem;
+}
+
+.sw-info h4 {
+  margin: 1.5rem 0 1rem 0;
+  color: #747bff;
+  font-size: 1.1rem;
+}
+
+.sw-info h5 {
+  margin: 1rem 0 0.5rem 0;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+/* ===== STATUS SECTION ===== */
+.sw-status {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+/* ===== UPDATE BANNER ===== */
+.update-banner {
+  background: linear-gradient(135deg, rgba(100, 108, 255, 0.2) 0%, rgba(116, 123, 255, 0.1) 100%);
+  border: 1px solid #646cff;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  animation: slideInDown 0.5s ease-out;
+}
+
+.update-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.update-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.update-text {
+  flex: 1;
+}
+
+.update-text strong {
+  color: #646cff;
+  font-size: 1.1rem;
+}
+
+.update-text p {
+  margin: 0.25rem 0 0 0;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.update-button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.update-button:hover {
+  background: #535bf2;
+  transform: translateY(-1px);
+}
+
+/* ===== CACHE INFO ===== */
+.cache-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cache-stat {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(100, 108, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(100, 108, 255, 0.2);
+}
+
+.cache-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #646cff;
+  margin-bottom: 0.25rem;
+}
+
+.cache-label {
+  font-size: 0.875rem;
+  color: #cccccc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cache-details {
+  margin: 1rem 0;
+}
+
+.cache-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.cache-item {
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid #646cff;
+}
+
+.cache-item code {
+  color: #ffa500;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.cache-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cache-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.cache-button.refresh {
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.cache-button.refresh:hover {
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.cache-button.clear {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+.cache-button.clear:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ===== STRATEGIES SECTION ===== */
+.strategy-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.strategy-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 4px solid #646cff;
+}
+
+.strategy-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.strategy-item strong {
+  color: #ffffff;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.strategy-item p {
+  color: #cccccc;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .sw-status {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .update-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .cache-actions {
+    flex-direction: column;
+  }
+  
+  .cache-button {
+    text-align: center;
+  }
+  
+  .cache-stats {
+    grid-template-columns: 1fr;
+  }
+}

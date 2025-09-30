@@ -1,8 +1,25 @@
+/* App Shell Architecture Variables */
+:root {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --bg-header: #242424;
+  --bg-footer: #181818;
+  --bg-hover: #333333;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #999999;
+  
+  --border-color: #404040;
+  --accent-primary: #646cff;
+  --accent-secondary: #747bff;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .logo {
