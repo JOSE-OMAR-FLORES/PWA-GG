@@ -1,0 +1,315 @@
+/* Splash Screen Styles */
+
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* ===== BACKGROUND ===== */
+.splash-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0a0a0a;
+}
+
+.splash-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(100, 108, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(116, 123, 255, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  animation: gradientShift 6s ease-in-out infinite;
+}
+
+.splash-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #646cff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat 4s ease-in-out infinite;
+}
+
+.particle-0 { top: 10%; left: 10%; animation-delay: 0s; }
+.particle-1 { top: 20%; left: 80%; animation-delay: 0.5s; }
+.particle-2 { top: 80%; left: 20%; animation-delay: 1s; }
+.particle-3 { top: 60%; left: 90%; animation-delay: 1.5s; }
+.particle-4 { top: 30%; left: 15%; animation-delay: 2s; }
+.particle-5 { top: 70%; left: 70%; animation-delay: 2.5s; }
+.particle-6 { top: 15%; left: 50%; animation-delay: 3s; }
+.particle-7 { top: 85%; left: 60%; animation-delay: 3.5s; }
+.particle-8 { top: 40%; left: 5%; animation-delay: 1.2s; }
+.particle-9 { top: 90%; left: 40%; animation-delay: 0.8s; }
+.particle-10 { top: 5%; left: 75%; animation-delay: 2.2s; }
+.particle-11 { top: 50%; left: 95%; animation-delay: 1.8s; }
+
+/* ===== CONTENT ===== */
+.splash-content {
+  text-align: center;
+  z-index: 2;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+/* ===== LOGO ===== */
+.splash-logo {
+  margin-bottom: 2rem;
+}
+
+.logo-container {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 120px;
+}
+
+.logo-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid transparent;
+  border-top: 3px solid #646cff;
+  border-right: 3px solid #747bff;
+  border-radius: 50%;
+  animation: logoSpin 2s linear infinite;
+}
+
+.logo-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  animation: logoPulse 2s ease-in-out infinite;
+}
+
+/* ===== TEXT ===== */
+.splash-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #646cff 0%, #747bff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleSlide 0.8s ease-out 0.3s both;
+}
+
+.splash-subtitle {
+  color: #cccccc;
+  font-size: 1rem;
+  margin-bottom: 3rem;
+  animation: subtitleSlide 0.8s ease-out 0.5s both;
+}
+
+/* ===== LOADING ===== */
+.loading-section {
+  margin-bottom: 2rem;
+  animation: loadingFade 0.8s ease-out 0.7s both;
+}
+
+.loading-bar {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #646cff 0%, #747bff 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.loading-glow {
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(100, 108, 255, 0.8) 0%, transparent 70%);
+  transform: translateX(-50%);
+  transition: left 0.3s ease;
+}
+
+.loading-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.loading-text {
+  color: #cccccc;
+}
+
+.loading-percentage {
+  color: #646cff;
+  font-weight: 600;
+}
+
+/* ===== FEATURES ===== */
+.splash-features {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: featuresSlide 0.8s ease-out 0.9s both;
+}
+
+.feature-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(100, 108, 255, 0.1);
+  border: 1px solid rgba(100, 108, 255, 0.3);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #cccccc;
+}
+
+.feature-icon {
+  font-size: 1rem;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gradientShift {
+  0%, 100% { 
+    filter: hue-rotate(0deg) brightness(1); 
+  }
+  50% { 
+    filter: hue-rotate(30deg) brightness(1.2); 
+  }
+}
+
+@keyframes particleFloat {
+  0%, 100% { 
+    opacity: 0; 
+    transform: translateY(0px) scale(0.5); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-20px) scale(1); 
+  }
+}
+
+@keyframes logoSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes titleSlide {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes subtitleSlide {
+  from { 
+    opacity: 0; 
+    transform: translateY(15px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes loadingFade {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes featuresSlide {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .splash-content {
+    padding: 1.5rem;
+    max-width: 320px;
+  }
+  
+  .logo-container {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .logo-icon {
+    font-size: 2rem;
+  }
+  
+  .splash-title {
+    font-size: 1.5rem;
+  }
+  
+  .splash-features {
+    gap: 0.5rem;
+  }
+  
+  .feature-badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem;
+  }
+}

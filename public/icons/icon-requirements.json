@@ -1,0 +1,27 @@
+{
+  "note": "Los iconos deben ser generados en formato PNG",
+  "sizes": [
+    "72x72",
+    "96x96",
+    "128x128",
+    "144x144",
+    "150x150",
+    "152x152",
+    "180x180",
+    "192x192",
+    "384x384",
+    "512x512"
+  ],
+  "requirements": [
+    "Los iconos deben ser cuadrados",
+    "Formato PNG recomendado",
+    "Deben soportar 'maskable' para Android",
+    "El icono de 180x180 es para Apple Touch Icon",
+    "El icono de 512x512 es requerido para PWA"
+  ],
+  "tools": [
+    "Puedes usar herramientas como Figma, Canva, o GIMP",
+    "También puedes usar generadores online como PWA Asset Generator",
+    "Para desarrollo, puedes convertir el SVG usando sharp o canvas"
+  ]
+}

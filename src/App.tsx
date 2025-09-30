@@ -1,34 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import AppShell from './components/AppShell'
+import HomeScreen from './components/HomeScreen'
+import SplashScreen from './components/SplashScreen'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showSplash, setShowSplash] = useState(true)
 
+  useEffect(() => {
+    // Simular carga inicial de la aplicación
+    const initApp = async () => {
+      try {
+        // Simular carga de recursos críticos
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Verificar Service Worker (opcional)
+        if ('serviceWorker' in navigator) {
+          try {
+            await navigator.serviceWorker.ready
+          } catch (swError) {
+            console.log('Service Worker no disponible, continuando...')
+          }
+        }
+        
+        // La carga se completa cuando termina el splash
+      } catch (error) {
+        console.error('Error durante la inicialización:', error)
+      }
+    }
+
+    initApp()
+  }, [])
+
+  const handleLoadingComplete = () => {
+    setShowSplash(false)
+  }
+
+  // Mostrar Splash Screen mientras carga
+  if (showSplash) {
+    return <SplashScreen onLoadingComplete={handleLoadingComplete} />
+  }
+
+  // Mostrar App Shell con contenido
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <AppShell>
+      <HomeScreen />
+    </AppShell>
   )
 }
 

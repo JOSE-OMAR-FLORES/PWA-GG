@@ -1,0 +1,22 @@
+{
+  "message": "Iconos SVG creados exitosamente",
+  "next_steps": [
+    "Los iconos SVG se han creado como placeholders",
+    "Para mejor compatibilidad, convierte a PNG usando:",
+    "1. Herramientas online: https://convertio.co/svg-png/",
+    "2. Software: GIMP, Inkscape, Adobe Illustrator",
+    "3. Comandos: imagemagick (convert icon.svg icon.png)"
+  ],
+  "required_png_sizes": [
+    "192x192",
+    "512x512"
+  ],
+  "optional_sizes": [
+    "72x72",
+    "96x96",
+    "128x128",
+    "144x144",
+    "152x152",
+    "384x384"
+  ]
+}
