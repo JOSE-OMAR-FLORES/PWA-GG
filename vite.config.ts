@@ -8,12 +8,66 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      strategies: 'injectManifest',
-      srcDir: 'public',
-      filename: 'service-worker.js',
+      strategies: 'generateSW',
       workbox: {
+        // Cachear TODOS los archivos posibles
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,txt,woff2}'],
+        
+        // Configuración robusta para offline desde cero
+        skipWaiting: true,
+        clientsClaim: true,
+        
+        // Runtime caching ultra-agresivo
         runtimeCaching: [
+          // 🏠 NAVEGACIÓN - Network First con timeout rápido y fallback
+          {
+            urlPattern: ({request}) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'navigation-cache',
+              networkTimeoutSeconds: 2, // Timeout muy rápido para ir al cache
+              plugins: [{
+                cacheKeyWillBeUsed: async () => '/index.html'
+              }]
+            }
+          },
+          
+          // 📄 HTML - Cache First
+          {
+            urlPattern: /\.(?:html)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'html-cache'
+            }
+          },
+          
+          // 🎨 CSS y JS - Cache First (CRÍTICO)
+          {
+            urlPattern: /\.(?:css|js)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-assets-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              }
+            }
+          },
+          
+          // 🖼️ IMÁGENES - Cache First
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              }
+            }
+          },
+          
+          // 🌐 FONTS - Cache First
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -35,21 +89,27 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365
               }
             }
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 30
-              }
-            }
           }
         ],
+        // Configuración robusta para SPA offline
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+        navigateFallbackAllowlist: [/^\/$/],
+        
+        // Precaching adicional ultra-completo
+        additionalManifestEntries: [
+          { url: '/', revision: null },
+          { url: '/index.html', revision: null },
+          { url: '/manifest.json', revision: null },
+          { url: '/manifest.webmanifest', revision: null },
+          { url: '/favicon.ico', revision: null }
+        ],
+        
+        // Incluir archivos adicionales críticos
+        dontCacheBustURLsMatching: /\.\w{8}\./,
+        
+        // Modo agresivo para offline
+        mode: 'production'
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {

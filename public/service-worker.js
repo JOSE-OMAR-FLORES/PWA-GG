@@ -13,14 +13,29 @@ if (workbox) {
   // Punto de inyección del manifest de Workbox - REQUERIDO para injectManifest
   workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
   
-  // Configurar navegación offline (CRITICAL para offline desde cero)
+  // Configurar navegación offline con fallback (CRITICAL para offline desde cero)
   workbox.routing.registerRoute(
     ({ request }) => request.mode === 'navigate',
-    new workbox.strategies.CacheFirst({
+    new workbox.strategies.NetworkFirst({
       cacheName: 'navigation-cache',
+      networkTimeoutSeconds: 3,
       plugins: [{
-        cacheKeyWillBeUsed: async ({request}) => {
-          return '/index.html';
+        cacheWillUpdate: async ({ response }) => {
+          return response.status === 200 ? response : null;
+        },
+        cacheKeyWillBeUsed: async () => '/index.html'
+      }]
+    })
+  );
+  
+  // Configurar estrategia para CSS y JS críticos
+  workbox.routing.registerRoute(
+    /\.(?:css|js)$/,
+    new workbox.strategies.CacheFirst({
+      cacheName: 'static-resources',
+      plugins: [{
+        cacheWillUpdate: async ({ response }) => {
+          return response.status === 200 ? response : null;
         }
       }]
     })
@@ -113,7 +128,8 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 🌐 INTERCEPCIÓN DE REQUESTS - Estrategias de cacheo
+// 🌐 INTERCEPCIÓN DE REQUESTS - Dejar que Workbox maneje las rutas registradas
+// Las rutas no registradas en Workbox seguirán siendo manejadas por la lógica manual
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const { url, method } = request;
@@ -124,20 +140,22 @@ self.addEventListener('fetch', (event) => {
   // Ignorar requests de extensiones del navegador
   if (url.includes('extension') || url.includes('chrome-')) return;
 
-  console.log('🔍 Service Worker: Interceptando:', url);
+  // Solo interceptar si Workbox no maneja esta ruta
+  const isHandledByWorkbox = 
+    request.mode === 'navigate' || 
+    /\.(?:css|js|png|jpg|jpeg|svg|gif|webp|ico)$/.test(url);
+  
+  if (isHandledByWorkbox) {
+    // Dejar que Workbox maneje
+    return;
+  }
 
-  // Determinar estrategia basada en la URL
+  console.log('🔍 Service Worker: Interceptando (no Workbox):', url);
+
+  // Solo manejar APIs y otros recursos no cubiertos por Workbox
   if (NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(url))) {
-    // 🌐 NETWORK FIRST - APIs, JSON
     event.respondWith(networkFirst(request));
-  } else if (CACHE_FIRST_PATTERNS.some(pattern => pattern.test(url))) {
-    // 📦 CACHE FIRST - Imágenes, CSS, JS, Fuentes
-    event.respondWith(cacheFirst(request));
-  } else if (request.mode === 'navigate' || url.endsWith('/') || url.includes('index.html')) {
-    // 🏠 CACHE FIRST para navegación (HTML) - CRITICAL para offline desde cero
-    event.respondWith(cacheFirstWithFallback(request));
   } else {
-    // 🔄 STALE WHILE REVALIDATE - otros recursos
     event.respondWith(staleWhileRevalidate(request));
   }
 });
