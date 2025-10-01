@@ -13,6 +13,19 @@ if (workbox) {
   // Punto de inyección del manifest de Workbox - REQUERIDO para injectManifest
   workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
   
+  // Configurar navegación offline (CRITICAL para offline desde cero)
+  workbox.routing.registerRoute(
+    ({ request }) => request.mode === 'navigate',
+    new workbox.strategies.CacheFirst({
+      cacheName: 'navigation-cache',
+      plugins: [{
+        cacheKeyWillBeUsed: async ({request}) => {
+          return '/index.html';
+        }
+      }]
+    })
+  );
+  
   // Limpiar caches antiguos automáticamente
   workbox.precaching.cleanupOutdatedCaches();
 } else {
@@ -29,9 +42,16 @@ const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/manifest.webmanifest',
+  '/icons/icon-72x72.png',
+  '/icons/icon-96x96.png',
+  '/icons/icon-128x128.png',
+  '/icons/icon-144x144.png',
+  '/icons/icon-152x152.png',
   '/icons/icon-192x192.png',
+  '/icons/icon-384x384.png',
   '/icons/icon-512x512.png',
-  // CSS y JS se cachearán automáticamente por Vite
+  '/favicon.ico'
 ];
 
 // URLs que requieren estrategia Network First
@@ -113,8 +133,11 @@ self.addEventListener('fetch', (event) => {
   } else if (CACHE_FIRST_PATTERNS.some(pattern => pattern.test(url))) {
     // 📦 CACHE FIRST - Imágenes, CSS, JS, Fuentes
     event.respondWith(cacheFirst(request));
+  } else if (request.mode === 'navigate' || url.endsWith('/') || url.includes('index.html')) {
+    // 🏠 CACHE FIRST para navegación (HTML) - CRITICAL para offline desde cero
+    event.respondWith(cacheFirstWithFallback(request));
   } else {
-    // 🔄 STALE WHILE REVALIDATE - HTML, otros recursos
+    // 🔄 STALE WHILE REVALIDATE - otros recursos
     event.respondWith(staleWhileRevalidate(request));
   }
 });
@@ -188,6 +211,50 @@ async function staleWhileRevalidate(request) {
 
   // Retornar cache inmediatamente si existe, sino esperar network
   return cachedResponse || fetchPromise;
+}
+
+// 🏠 Cache First con fallback para navegación (CRITICAL para offline desde cero)
+async function cacheFirstWithFallback(request) {
+  try {
+    // Buscar en cache primero
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      console.log('✅ Navigation Cache HIT:', request.url);
+      return cachedResponse;
+    }
+
+    // Si no está en cache, buscar index.html como fallback
+    const indexResponse = await caches.match('/index.html');
+    if (indexResponse) {
+      console.log('🏠 Using cached index.html as fallback for:', request.url);
+      return indexResponse;
+    }
+
+    // Si tampoco está index.html, intentar network
+    console.log('⬇️ Navigation Cache MISS, trying network:', request.url);
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse && networkResponse.status === 200) {
+      const cache = await caches.open(STATIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.error('❌ Navigation failed, using index.html fallback:', error);
+    
+    // Último recurso: intentar servir index.html desde cache
+    const indexFallback = await caches.match('/index.html');
+    if (indexFallback) {
+      return indexFallback;
+    }
+    
+    return new Response('PWA Offline - No hay conexión', { 
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'text/html' }
+    });
+  }
 }
 
 // 📬 Manejo de mensajes desde la aplicación
