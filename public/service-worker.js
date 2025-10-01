@@ -1,11 +1,23 @@
 // service-worker.js - Service Worker personalizado para Mi PWA - JOFM
-import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
+// Importar Workbox usando importScripts
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.3.0/workbox-sw.js');
 
-// Workbox manifest injection point
-precacheAndRoute(self.__WB_MANIFEST);
+if (workbox) {
+  console.log('🎉 Workbox cargado correctamente');
+  
+  // Configurar Workbox PRIMERO
+  workbox.setConfig({
+    debug: true
+  });
 
-// Limpiar caches antiguos automáticamente
-cleanupOutdatedCaches();
+  // Punto de inyección del manifest de Workbox - REQUERIDO para injectManifest
+  workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
+  
+  // Limpiar caches antiguos automáticamente
+  workbox.precaching.cleanupOutdatedCaches();
+} else {
+  console.log('❌ Workbox no pudo cargar');
+}
 
 // Versión del cache - incrementar para forzar actualizaciones
 const CACHE_NAME = 'mi-pwa-jofm-v1.0.0';
