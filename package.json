@@ -16,6 +16,7 @@
     "sw:info": "echo 'Service Worker configurado con Workbox y Vite-PWA'"
   },
   "dependencies": {
+    "idb": "^8.0.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "workbox-window": "^7.3.0"
