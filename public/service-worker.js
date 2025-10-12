@@ -1,138 +1,87 @@
-// 🧭 service-worker.js - Versión corregida y optimizada (JOFM)
-
-// ✅ Importar Workbox (una sola vez)
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.3.0/workbox-sw.js');
-
-if (workbox) {
-  console.log('🎉 Workbox cargado correctamente');
-  workbox.setConfig({ debug: false });
-
-  // 📦 Precarga de recursos críticos
-  workbox.precaching.precacheAndRoute([
-    { url: '/index.html', revision: '1' },
-    { url: '/offline.html', revision: '1' },
-    { url: '/manifest.json', revision: '1' },
-    { url: '/icons/icon-72x72.png', revision: '1' },
-    { url: '/icons/icon-96x96.png', revision: '1' },
-    { url: '/icons/icon-128x128.png', revision: '1' },
-    { url: '/icons/icon-144x144.png', revision: '1' },
-    { url: '/icons/icon-152x152.png', revision: '1' },
-    { url: '/icons/icon-192x192.png', revision: '1' },
-    { url: '/icons/icon-384x384.png', revision: '1' },
-    { url: '/icons/icon-512x512.png', revision: '1' },
-    { url: '/favicon.ico', revision: '1' },
-  ]);
-
-  // 🧭 Navegación: NetworkFirst con fallback a offline.html
-  workbox.routing.registerRoute(
-    ({ request }) => request.mode === 'navigate',
-    new workbox.strategies.NetworkFirst({
-      cacheName: 'pages-cache',
-      networkTimeoutSeconds: 3,
-      plugins: [
-        {
-          handlerDidError: async () => {
-            return caches.match('/offline.html');
-          },
-        },
-      ],
-    })
-  );
-
-  // 🧰 Recursos estáticos: CacheFirst
-  workbox.routing.registerRoute(
-    /\.(?:css|js|png|jpg|jpeg|svg|gif|webp|ico)$/,
-    new workbox.strategies.CacheFirst({
-      cacheName: 'static-resources',
-    })
-  );
-
-  // 🧼 Limpiar caches antiguos automáticamente
-  workbox.precaching.cleanupOutdatedCaches();
-} else {
-  console.log('❌ Workbox no pudo cargar');
-}
-
-// 📌 Nombre fijo del cache para evitar recargas infinitas
-const CACHE_NAME = 'mi-pwa-jofm-v1.0.0';
-const DYNAMIC_CACHE = 'dynamic-cache-v1';
-
-// 🔧 INSTALACIÓN
-self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker: Instalando...');
-  event.waitUntil(self.skipWaiting());
-});
-
-// 🚀 ACTIVACIÓN
-self.addEventListener('activate', (event) => {
-  console.log('🚀 Service Worker: Activando...');
-  event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== DYNAMIC_CACHE) {
-            console.log('🗑️ Borrando cache antiguo:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      )
-    ).then(() => self.clients.claim())
-  );
-});
-
-// 🌐 INTERCEPCIÓN de APIs personalizadas (NO manejadas por Workbox)
-const NETWORK_FIRST_PATTERNS = [
-  /\/api\//,
-  /\.json$/
+// ===============================
+// 🚀 SERVICE WORKER ESTABLE PARA PWA
+// ===============================
+const VERSION = 'v1.0.0';
+const CACHE_NAME = `pwa-cache-${VERSION}`;
+const ASSETS = [
+	'/',
+	'/index.html',
+	'/manifest.json',
+	'/favicon.ico',
+	// Agrega aquí tus archivos principales (ajusta según tu proyecto)
+	'/offline.html',
+	'/icons/icon-72x72.png',
+	'/icons/icon-96x96.png',
+	'/icons/icon-128x128.png',
+	'/icons/icon-144x144.png',
+	'/icons/icon-152x152.png',
+	'/icons/icon-192x192.png',
+	'/icons/icon-384x384.png',
+	'/icons/icon-512x512.png'
 ];
-
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
-
-  if (NETWORK_FIRST_PATTERNS.some((pattern) => pattern.test(request.url))) {
-    event.respondWith(networkFirst(request));
-  }
+// ===============================
+// 📦 INSTALACIÓN
+// ===============================
+self.addEventListener('install', event => {
+	console.log('[SW] Instalando service worker...');
+	event.waitUntil(
+		caches.open(CACHE_NAME).then(cache => {
+			console.log('[SW] Archivos cacheados');
+			return cache.addAll(ASSETS);
+		})
+	);
+	self.skipWaiting();
 });
 
-// 🌐 Estrategia Network First manual (solo para APIs)
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    if (response && response.status === 200) {
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch (error) {
-    console.log('📦 Network falló, usando cache:', request.url);
-    const cachedResponse = await caches.match(request);
-    return cachedResponse || new Response('Offline - No hay conexión', { status: 503 });
-  }
-}
-
-// 📬 Mensajes desde la app
-self.addEventListener('message', (event) => {
-  const { type } = event.data || {};
-  if (type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+// ===============================
+// 🧹 ACTIVACIÓN
+self.addEventListener('activate', event => {
+	console.log('[SW] Activando service worker...');
+	event.waitUntil(
+		caches.keys().then(keys => {
+			return Promise.all(
+				keys.map(key => {
+					if (key !== CACHE_NAME) {
+						console.log('[SW] Borrando caché viejo:', key);
+						return caches.delete(key);
+					}
+				})
+			);
+		})
+	);
+	self.clients.claim();
 });
 
-// 🔔 Push notifications
-self.addEventListener('push', (event) => {
-  console.log('🔔 Notificación push recibida');
-  const options = {
-    body: event.data ? event.data.text() : 'Nueva notificación',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-192x192.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    }
-  };
-  event.waitUntil(self.registration.showNotification('Mi PWA - JOFM', options));
-});
+// ===============================
+// 🌐 INTERCEPTAR SOLICITUDES
+self.addEventListener('fetch', event => {
+	if (event.request.method !== 'GET') return;
 
-console.log('✅ Service Worker cargado y listo - Mi PWA JOFM');
+	event.respondWith(
+		caches.match(event.request).then(cachedResponse => {
+			if (cachedResponse) return cachedResponse;
+			return fetch(event.request)
+				.then(networkResponse => {
+					return caches.open(CACHE_NAME).then(cache => {
+						if (event.request.url.startsWith(self.location.origin)) {
+							cache.put(event.request, networkResponse.clone());
+						}
+						return networkResponse;
+					});
+				})
+				.catch(() => {
+					if (event.request.destination === 'document') {
+						return caches.match('/offline.html') || caches.match('/index.html');
+					}
+				});
+		})
+	);
+});
+// ===============================
+// 🔔 MANEJO DE ACTUALIZACIONES MANUAL (opcional)
+// ===============================
+self.addEventListener('message', event => {
+	if (event.data && event.data.type === 'SKIP_WAITING') {
+		self.skipWaiting();
+	}
+});
