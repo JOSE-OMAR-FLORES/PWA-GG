@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './AppShell.css';
+
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+const AppShell: React.FC<AppShellProps> = ({ children }) => {
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   return (
     <div className="app-shell">
+      {isOffline && (
+        <div style={{
+          background: '#ffcc00',
+          color: '#222',
+          padding: '8px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          zIndex: 1000
+        }}>
+          ⚠️ Estás en modo offline. Los cambios se guardarán localmente.
+        </div>
+      )}
       {/* Header fijo - parte del shell */}
       <header className="app-header">
         <div className="header-content">

@@ -1,4 +1,5 @@
 import React from 'react';
+import OfflineForm from './OfflineForm';
 import PWAInfo from './PWAInfo';
 import ServiceWorkerInfo from './ServiceWorkerInfo';
 import './HomeScreen.css';
@@ -100,6 +101,13 @@ export const HomeScreen: React.FC = () => {
               <div className="stat-label">Disponibilidad</div>
             </div>
           </div>
+        </div>
+      </section>
+      {/* Formulario Offline */}
+      <section className="offline-form-section">
+        <div className="container">
+          <h2 className="section-title text-center">📝 Tareas Offline</h2>
+          <OfflineForm />
         </div>
       </section>
     </div>
