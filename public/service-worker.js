@@ -16,16 +16,20 @@ if (workbox) {
   // Configurar navegación offline con fallback (CRITICAL para offline desde cero)
   workbox.routing.registerRoute(
     ({ request }) => request.mode === 'navigate',
-    new workbox.strategies.NetworkFirst({
-      cacheName: 'navigation-cache',
-      networkTimeoutSeconds: 3,
-      plugins: [{
-        cacheWillUpdate: async ({ response }) => {
-          return response.status === 200 ? response : null;
-        },
-        cacheKeyWillBeUsed: async () => '/index.html'
-      }]
-    })
+    async ({ event }) => {
+      try {
+        // Intentar red normal
+        return await workbox.strategies.networkFirst({
+          cacheName: 'navigation-cache',
+          networkTimeoutSeconds: 3,
+        }).handle({ event });
+      } catch (error) {
+        // Si falla, servir offline.html
+        const cache = await caches.open('static-cache-v1');
+        const offlineResponse = await cache.match('/offline.html');
+        return offlineResponse || Response.error();
+      }
+    }
   );
   
   // Configurar estrategia para CSS y JS críticos
@@ -58,6 +62,7 @@ const STATIC_ASSETS = [
   '/index.html',
   '/manifest.json',
   '/manifest.webmanifest',
+  '/offline.html',
   '/icons/icon-72x72.png',
   '/icons/icon-96x96.png',
   '/icons/icon-128x128.png',
