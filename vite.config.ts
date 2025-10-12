@@ -7,52 +7,44 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate', // ✅ Cambiado de 'prompt' a 'autoUpdate'
+      injectRegister: 'auto', // ✅ Cambiado de false a 'auto'
       strategies: 'generateSW',
+      
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,txt,woff2}'],
-        skipWaiting: false,
-        clientsClaim: false,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
         cleanupOutdatedCaches: true,
         
-        // Runtime caching ultra-agresivo
+        // Runtime caching optimizado
         runtimeCaching: [
-          // 🏠 NAVEGACIÓN - Network First con timeout rápido y fallback
+          // 🏠 NAVEGACIÓN
           {
             urlPattern: ({request}) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'navigation-cache',
-              networkTimeoutSeconds: 2, // Timeout muy rápido para ir al cache
-              plugins: [{
-                cacheKeyWillBeUsed: async () => '/index.html'
-              }]
-            }
-          },
-          
-          // 📄 HTML - Cache First
-          {
-            urlPattern: /\.(?:html)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'html-cache'
-            }
-          },
-          
-          // 🎨 CSS y JS - Cache First (CRÍTICO)
-          {
-            urlPattern: /\.(?:css|js)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'static-assets-cache',
+              networkTimeoutSeconds: 3,
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 365
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 días
               }
             }
           },
           
-          // 🖼️ IMÁGENES - Cache First
+          // 🎨 CSS y JS
+          {
+            urlPattern: /\.(?:css|js)$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'static-assets',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 días
+              }
+            }
+          },
+          
+          // 🖼️ IMÁGENES
           {
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
             handler: 'CacheFirst',
@@ -60,17 +52,17 @@ export default defineConfig({
               cacheName: 'images-cache',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 365
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 año
               }
             }
           },
           
-          // 🌐 FONTS - Cache First
+          // 🌐 GOOGLE FONTS
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'google-fonts-cache',
+              cacheName: 'google-fonts-stylesheets',
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365
@@ -81,99 +73,91 @@ export default defineConfig({
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'gstatic-fonts-cache',
+              cacheName: 'google-fonts-webfonts',
               expiration: {
-                maxEntries: 10,
+                maxEntries: 30,
                 maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           }
         ],
-        // Configuración robusta para SPA offline
+        
+        // Fallback para navegación offline
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
-        navigateFallbackAllowlist: [/^\/$/],
-        
-        // Precaching adicional ultra-completo
-        additionalManifestEntries: [
-          { url: '/', revision: null },
-          { url: '/index.html', revision: null },
-          { url: '/manifest.json', revision: null },
-          { url: '/manifest.webmanifest', revision: null },
-          { url: '/favicon.ico', revision: null }
-        ],
-        
-        // Incluir archivos adicionales críticos
-        dontCacheBustURLsMatching: /\.\w{8}\./,
-        
-        // Modo agresivo para offline
-        mode: 'production'
+        navigateFallbackDenylist: [/^\/api/, /\.[^/]+$/]
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      
+      // ✅ REMOVIDO includeAssets que causaba el error
+      
       manifest: {
         name: 'Mi Aplicación PWA - JOFM',
         short_name: 'PWA-JOFM',
         description: 'Progressive Web Application desarrollada con React, TypeScript y Vite',
-        theme_color: '#000000',
+        theme_color: '#667eea',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
         start_url: '/',
         scope: '/',
+        lang: 'es',
         icons: [
           {
-            src: 'icons/icon-72x72.png',
+            src: '/icons/icon-72x72.png',
             sizes: '72x72',
             type: 'image/png',
-            purpose: 'maskable any'
+            purpose: 'any'
           },
           {
-            src: 'icons/icon-96x96.png',
+            src: '/icons/icon-96x96.png',
             sizes: '96x96',
             type: 'image/png',
-            purpose: 'maskable any'
+            purpose: 'any'
           },
           {
-            src: 'icons/icon-128x128.png',
+            src: '/icons/icon-128x128.png',
             sizes: '128x128',
             type: 'image/png',
-            purpose: 'maskable any'
+            purpose: 'any'
           },
           {
-            src: 'icons/icon-144x144.png',
+            src: '/icons/icon-144x144.png',
             sizes: '144x144',
             type: 'image/png',
-            purpose: 'maskable any'
+            purpose: 'any'
           },
           {
-            src: 'icons/icon-152x152.png',
+            src: '/icons/icon-152x152.png',
             sizes: '152x152',
             type: 'image/png',
-            purpose: 'maskable any'
+            purpose: 'any'
           },
           {
-            src: 'icons/icon-192x192.png',
+            src: '/icons/icon-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable any'
           },
           {
-            src: 'icons/icon-384x384.png',
+            src: '/icons/icon-384x384.png',
             sizes: '384x384',
             type: 'image/png',
-            purpose: 'maskable any'
+            purpose: 'any'
           },
           {
-            src: 'icons/icon-512x512.png',
+            src: '/icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable any'
           }
         ]
       },
+      
       devOptions: {
-        enabled: true
+        enabled: false // ✅ Desactivado en desarrollo para evitar conflictos
       }
     })
-  ],
+  ]
 })

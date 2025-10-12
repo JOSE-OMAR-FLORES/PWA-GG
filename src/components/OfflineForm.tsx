@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { addTask, getAllTasks } from "../utils/indexedDB";
+import { addTask, getAllTasks } from "../utils/db";
 
 interface Task {
   id: number;
