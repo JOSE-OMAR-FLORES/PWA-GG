@@ -3,33 +3,25 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
-// Registro ultra-robsto de Service Worker para PWA offline
+// Registro del Service Worker para PWA
 if ('serviceWorker' in navigator) {
-  // Registro inmediato sin esperar 'load'
-  navigator.serviceWorker.register('/sw.js', { 
-    scope: '/',
-    updateViaCache: 'none' // Forzar actualización sin cache
-  })
-    .then(registration => {
-      console.log('🎉 Service Worker ultra-robusto registrado:', registration.scope);
-      
-      // Forzar activación inmediata si hay un SW en espera
-      if (registration.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
-      
-      // Escuchar updates del SW
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 Nueva versión del SW disponible, recargando...');
-              window.location.reload();
-            }
-          });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('✅ Service Worker registrado:', registration.scope);
+        
+        // Solo actualizar cuando el usuario confirme
+        if (registration.waiting) {
+          if (window.confirm('Nueva versión disponible. ¿Actualizar?')) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
         }
+      })
+      .catch((error) => {
+        console.error('❌ Error al registrar Service Worker:', error);
       });
+  });
     })
     .catch(error => {
       console.error('❌ Error registrando Service Worker:', error);

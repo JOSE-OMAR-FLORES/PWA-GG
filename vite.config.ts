@@ -7,15 +7,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       strategies: 'generateSW',
       workbox: {
-        // Cachear TODOS los archivos posibles
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,txt,woff2}'],
-        
-        // Configuración robusta para offline desde cero
-        skipWaiting: true,
-        clientsClaim: true,
+        skipWaiting: false,
+        clientsClaim: false,
+        cleanupOutdatedCaches: true,
         
         // Runtime caching ultra-agresivo
         runtimeCaching: [
