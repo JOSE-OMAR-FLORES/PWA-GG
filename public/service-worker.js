@@ -5,43 +5,49 @@ importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.3.0/workbox
 if (workbox) {
   console.log('🎉 Workbox cargado correctamente');
   
-  // Configurar Workbox PRIMERO
+  // Configurar Workbox
   workbox.setConfig({
     debug: true
   });
 
-  // Punto de inyección del manifest de Workbox - REQUERIDO para injectManifest
-  workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
+  // Precache manual de recursos críticos (sin __WB_MANIFEST)
+  workbox.precaching.precacheAndRoute([
+    { url: '/', revision: null },
+    { url: '/index.html', revision: null },
+    { url: '/offline.html', revision: null },
+    { url: '/manifest.json', revision: null },
+    { url: '/icons/icon-72x72.png', revision: null },
+    { url: '/icons/icon-96x96.png', revision: null },
+    { url: '/icons/icon-128x128.png', revision: null },
+    { url: '/icons/icon-144x144.png', revision: null },
+    { url: '/icons/icon-152x152.png', revision: null },
+    { url: '/icons/icon-192x192.png', revision: null },
+    { url: '/icons/icon-384x384.png', revision: null },
+    { url: '/icons/icon-512x512.png', revision: null },
+    { url: '/favicon.ico', revision: null },
+  ]);
   
-  // Configurar navegación offline con fallback (CRITICAL para offline desde cero)
+  // Configurar navegación con fallback a offline.html
   workbox.routing.registerRoute(
     ({ request }) => request.mode === 'navigate',
-    async ({ event }) => {
-      try {
-        // Intentar red normal
-        return await workbox.strategies.networkFirst({
-          cacheName: 'navigation-cache',
-          networkTimeoutSeconds: 3,
-        }).handle({ event });
-      } catch (error) {
-        // Si falla, servir offline.html
-        const cache = await caches.open('static-cache-v1');
-        const offlineResponse = await cache.match('/offline.html');
-        return offlineResponse || Response.error();
-      }
-    }
+    new workbox.strategies.NetworkFirst({
+      cacheName: 'pages-cache',
+      networkTimeoutSeconds: 3,
+      plugins: [
+        {
+          handlerDidError: async () => {
+            return caches.match('/offline.html');
+          },
+        },
+      ],
+    })
   );
   
-  // Configurar estrategia para CSS y JS críticos
+  // Configurar estrategia para recursos estáticos
   workbox.routing.registerRoute(
-    /\.(?:css|js)$/,
+    /\.(?:css|js|png|jpg|jpeg|svg|gif|webp|ico)$/,
     new workbox.strategies.CacheFirst({
       cacheName: 'static-resources',
-      plugins: [{
-        cacheWillUpdate: async ({ response }) => {
-          return response.status === 200 ? response : null;
-        }
-      }]
     })
   );
   
@@ -87,18 +93,14 @@ const CACHE_FIRST_PATTERNS = [
   /fonts\./
 ];
 
-// 🚀 INSTALACIÓN - Cachear recursos críticos
+// 🚀 INSTALACIÓN - Workbox maneja el precache automáticamente
 self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker: Instalando...');
   
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('📦 Service Worker: Cacheando App Shell');
-        return cache.addAll(STATIC_ASSETS);
-      })
+    Promise.resolve()
       .then(() => {
-        console.log('✅ Service Worker: App Shell cacheado exitosamente');
+        console.log('✅ Service Worker: Workbox maneja el precache automáticamente');
         return self.skipWaiting(); // Activar inmediatamente
       })
       .catch((error) => {
@@ -133,8 +135,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 🌐 INTERCEPCIÓN DE REQUESTS - Dejar que Workbox maneje las rutas registradas
-// Las rutas no registradas en Workbox seguirán siendo manejadas por la lógica manual
+// 🌐 INTERCEPCIÓN DE REQUESTS - Solo para APIs no manejadas por Workbox
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const { url, method } = request;
@@ -145,24 +146,12 @@ self.addEventListener('fetch', (event) => {
   // Ignorar requests de extensiones del navegador
   if (url.includes('extension') || url.includes('chrome-')) return;
 
-  // Solo interceptar si Workbox no maneja esta ruta
-  const isHandledByWorkbox = 
-    request.mode === 'navigate' || 
-    /\.(?:css|js|png|jpg|jpeg|svg|gif|webp|ico)$/.test(url);
-  
-  if (isHandledByWorkbox) {
-    // Dejar que Workbox maneje
-    return;
-  }
-
-  console.log('🔍 Service Worker: Interceptando (no Workbox):', url);
-
-  // Solo manejar APIs y otros recursos no cubiertos por Workbox
+  // Solo manejar APIs específicas que Workbox no cubre
   if (NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(url))) {
+    console.log('🔍 Service Worker: Interceptando API:', url);
     event.respondWith(networkFirst(request));
-  } else {
-    event.respondWith(staleWhileRevalidate(request));
   }
+  // Dejar todo lo demás para Workbox (navegación, recursos estáticos, etc.)
 });
 
 // 📦 Estrategia Cache First
