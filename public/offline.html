@@ -200,14 +200,14 @@
       La PWA funciona sin conexión gracias al caché inteligente.
     </div>
 
-    <div class="offline-actions">
-      <button class="btn btn-primary" onclick="tryReload()">
-        🔄 Reintentar Conexión
-      </button>
-      <button class="btn btn-secondary" onclick="goBack()">
-        ⬅️ Volver Atrás
-      </button>
-    </div>
+   <div class="offline-actions">
+  <button class="btn btn-primary" onclick="enterAppOffline()">
+    🚀 Entrar a la App
+  </button>
+  <button class="btn btn-secondary" onclick="tryReload()">
+    🔄 Reintentar Conexión
+  </button>
+</div>
 
     <div class="offline-tips">
       <h3>💡 ¿Qué puedes hacer offline?</h3>
@@ -220,39 +220,39 @@
     </div>
   </div>
 
-  <script>
-    function tryReload() {
+<script>
+  function enterAppOffline() {
+    // Ir a la app (index.html está cacheado)
+    window.location.href = '/';
+  }
+
+  function tryReload() {
+    window.location.reload();
+  }
+
+  // Detectar cuando vuelva la conexión
+  window.addEventListener('online', () => {
+    const message = document.createElement('div');
+    message.textContent = '✅ ¡Conexión recuperada! Recargando...';
+    message.style.cssText = `
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4ade80;
+      color: #222;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    `;
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
       window.location.reload();
-    }
-
-    function goBack() {
-      window.history.back();
-    }
-
-    // Detectar cuando vuelva la conexión
-    window.addEventListener('online', () => {
-      // Recargar automáticamente cuando vuelva conexión
-      const message = document.createElement('div');
-      message.textContent = '✅ ¡Conexión recuperada! Recargando...';
-      message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #4ade80;
-        color: #222;
-        padding: 1rem 2rem;
-        border-radius: 8px;
-        font-weight: bold;
-        z-index: 1000;
-        animation: slideIn 0.3s ease-out;
-      `;
-      document.body.appendChild(message);
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    });
-  </script>
+    }, 1500);
+  });
+</script>
 </body>
 </html>
