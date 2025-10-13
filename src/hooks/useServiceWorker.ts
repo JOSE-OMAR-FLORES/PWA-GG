@@ -40,7 +40,7 @@ export const useServiceWorker = () => {
       console.log('🔄 Registrando Service Worker personalizado...')
       setSwStatus('loading')
       
-      const registration = await navigator.serviceWorker.register('/service-worker.js', {
+const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/'
       })
       

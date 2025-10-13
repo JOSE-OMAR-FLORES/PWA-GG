@@ -2,6 +2,7 @@ import React from 'react';
 import OfflineForm from './OfflineForm';
 import PWAInfo from './PWAInfo';
 import ServiceWorkerInfo from './ServiceWorkerInfo';
+import CacheDebugPanel from './CacheDebugPanel';
 import './HomeScreen.css';
 
 export const HomeScreen: React.FC = () => {
@@ -88,7 +89,7 @@ export const HomeScreen: React.FC = () => {
           
           <div className="stat-card">
             <div className="stat-number">100%</div>
-            <div className="stat-label">PWA Score</div>
+            <div className="stat-label">PWA Score</div> 
           </div>
           
           <div className="stat-card">
@@ -108,6 +109,12 @@ export const HomeScreen: React.FC = () => {
         <div className="container">
           <h2 className="section-title text-center">📝 Tareas Offline</h2>
           <OfflineForm />
+        </div>
+      </section>
+      {/* Debug Panel */}
+      <section style={{ marginTop: '3rem' }}>
+        <div className="container">
+          <CacheDebugPanel />
         </div>
       </section>
     </div>
