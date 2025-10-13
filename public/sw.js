@@ -177,14 +177,24 @@ self.addEventListener('fetch', event => {
 
   // ===== FALLBACK GENÉRICO =====
   event.respondWith(
-    fetch(request).catch(() => {
-      if (request.destination === 'document') {
-        return caches.match('/offline.html') ||
-               new Response('Offline');
-      }
-      return caches.match(request) ||
-             new Response('Recurso no disponible', { status: 503 });
-    })
+    fetch(request)
+      .then(response => {
+        // Si es 404 del servidor, servir 404.html
+        if (response.status === 404 && request.destination === 'document') {
+          return caches.match('/404.html') || response;
+        }
+        return response;
+      })
+      .catch(() => {
+        if (request.destination === 'document') {
+          // Sin internet: mostrar offline.html
+          console.log('[SW] 📴 Sin conexión, mostrando offline.html');
+          return caches.match('/offline.html') ||
+                 new Response('Offline');
+        }
+        return caches.match(request) ||
+               new Response('Recurso no disponible', { status: 503 });
+      })
   );
 });
 
@@ -194,6 +204,11 @@ self.addEventListener('fetch', event => {
 
 function isStaticAsset(url) {
   // App Shell: HTML, CSS, JS, SVG
+  // PERO excluir 404.html y offline.html
+  if (url.includes('/404.html') || url.includes('/offline.html')) {
+    return false;
+  }
+  
   return url.includes('.html') ||
          url.includes('.css') ||
          url.includes('.js') ||
