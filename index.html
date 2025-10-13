@@ -1,42 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- PWA Primary Meta Tags -->
     <title>Mi Aplicación PWA - JOFM</title>
-    <meta name="title" content="Mi Aplicación PWA - JOFM" />
-    <meta name="description" content="Una aplicación web progresiva desarrollada con React, TypeScript y Vite" />
-    
-    <!-- PWA Manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <link rel="manifest" href="/manifest.json" />
-    
-    <!-- PWA Apple Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="PWA-JOFM" />
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
-    
-    <!-- PWA Microsoft Meta Tags -->
-    <meta name="msapplication-TileColor" content="#000000" />
-    <meta name="msapplication-config" content="/browserconfig.xml" />
-    
-    <!-- PWA Theme Colors -->
-    <meta name="theme-color" content="#000000" />
-    <meta name="background-color" content="#ffffff" />
-    
-    <!-- PWA Other Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="PWA-JOFM" />
+    <meta name="theme-color" content="#646cff" />
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- ⚡ REGISTRAR SERVICE WORKER PRIMERO - ANTES DE REACT -->
+    <script>
+      (function() {
+        console.log('🚀 [BOOT] Iniciando registro temprano de Service Worker...');
+        
+        if ('serviceWorker' in navigator) {
+          // Registrar INMEDIATAMENTE sin esperar a que cargue React
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(registration => {
+              console.log('✅ [BOOT] Service Worker registrado exitosamente:', registration.scope);
+              
+              // Mostrar cuando hay actualizaciones
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('🔄 [BOOT] Actualización de SW encontrada');
+                
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('📦 [BOOT] Nueva versión del SW lista');
+                      // Guardar en localStorage para notificar a la app
+                      localStorage.setItem('swUpdateAvailable', 'true');
+                      window.dispatchEvent(new Event('swUpdateAvailable'));
+                    }
+                  });
+                }
+              });
+
+              // Escuchar cuando el SW toma control
+              navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('🚀 [BOOT] Nuevo SW tomó control');
+              });
+            })
+            .catch(error => {
+              console.error('❌ [BOOT] Error registrando SW:', error);
+            });
+        } else {
+          console.warn('⚠️ [BOOT] Service Worker no soportado en este navegador');
+        }
+      })();
+    </script>
+
+    <!-- ⚡ LUEGO CARGAR REACT -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
