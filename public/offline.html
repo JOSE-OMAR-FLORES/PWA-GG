@@ -11,29 +11,64 @@
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+      height: 100%;
+      width: 100%;
+    }
+
     body {
       background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
       color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      overflow: hidden;
-      padding: 20px;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Estilos para la barra de scroll - Chrome, Edge, Safari */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(100, 108, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #646cff 0%, #747bff 100%);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #747bff 0%, #8585ff 100%);
+    }
+
+    /* Para Firefox */
+    html {
+      scrollbar-color: #646cff rgba(100, 108, 255, 0.1);
+      scrollbar-width: thin;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 600px;
     }
 
     .offline-container {
       text-align: center;
-      max-width: 500px;
-      animation: slideIn 0.6s ease-out;
+      padding: 30px 20px;
     }
 
     .offline-icon {
       font-size: 6rem;
       margin-bottom: 1.5rem;
       animation: float 3s ease-in-out infinite;
+      display: inline-block;
     }
 
     .offline-title {
@@ -68,6 +103,7 @@
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      margin-bottom: 2rem;
     }
 
     .btn {
@@ -83,6 +119,7 @@
       justify-content: center;
       gap: 0.5rem;
       min-height: 44px;
+      width: 100%;
     }
 
     .btn-primary {
@@ -93,6 +130,10 @@
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(100, 108, 255, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
     }
 
     .btn-secondary {
@@ -106,15 +147,12 @@
     }
 
     .offline-tips {
-      margin-top: 2rem;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      text-align: left;
       background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       padding: 1.5rem;
-      font-size: 0.875rem;
-      color: #999999;
+      margin-bottom: 2rem;
+      text-align: left;
     }
 
     .offline-tips h3 {
@@ -129,9 +167,12 @@
     }
 
     .offline-tips li {
-      padding: 0.5rem 0;
+      padding: 0.75rem 0;
       padding-left: 1.5rem;
       position: relative;
+      color: #999999;
+      font-size: 0.9rem;
+      line-height: 1.5;
     }
 
     .offline-tips li:before {
@@ -140,6 +181,56 @@
       left: 0;
       color: #4ade80;
       font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .offline-faq {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .offline-faq h3 {
+      color: #cccccc;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .faq-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .faq-question {
+      color: #646cff;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .faq-answer {
+      color: #999999;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .footer-info {
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+      padding: 2rem 0 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
     }
 
     @keyframes float {
@@ -160,6 +251,10 @@
         opacity: 1;
         transform: translateY(0);
       }
+    }
+
+    .offline-container {
+      animation: slideIn 0.6s ease-out;
     }
 
     @media (max-width: 480px) {
@@ -186,73 +281,106 @@
   </style>
 </head>
 <body>
-  <div class="offline-container">
-    <div class="offline-icon">📴</div>
-    
-    <h1 class="offline-title">Sin Conexión</h1>
-    
-    <p class="offline-subtitle">
-      No hay conexión a internet disponible en este momento.
-    </p>
+  <div class="wrapper">
+    <div class="offline-container">
+      <div class="offline-icon">📴</div>
+      
+      <h1 class="offline-title">Sin Conexión</h1>
+      
+      <p class="offline-subtitle">
+        No hay conexión a internet disponible en este momento.
+      </p>
 
-    <div class="offline-hint">
-      ⚡ Pero no te preocupes, puedes seguir usando la app si la habías abierto antes.
-      La PWA funciona sin conexión gracias al caché inteligente.
-    </div>
+      <div class="offline-hint">
+        ⚡ Pero no te preocupes, puedes seguir usando la app si la habías abierto antes.
+        La PWA funciona sin conexión gracias al caché inteligente.
+      </div>
 
-   <div class="offline-actions">
-  <button class="btn btn-primary" onclick="enterAppOffline()">
-    🚀 Entrar a la App
-  </button>
-  <button class="btn btn-secondary" onclick="tryReload()">
-    🔄 Reintentar Conexión
-  </button>
-</div>
+      <div class="offline-actions">
+        <button class="btn btn-primary" onclick="enterAppOffline()">
+          🚀 Entrar a la App
+        </button>
+        <button class="btn btn-secondary" onclick="tryReload()">
+          🔄 Reintentar Conexión
+        </button>
+      </div>
 
-    <div class="offline-tips">
-      <h3>💡 ¿Qué puedes hacer offline?</h3>
-      <ul>
-        <li>Ver la página de inicio (App Shell cacheada)</li>
-        <li>Navegar por secciones descargadas anteriormente</li>
-        <li>Usar el gestor de tareas (datos locales)</li>
-        <li>Ver imágenes cacheadas</li>
-      </ul>
+      <div class="offline-tips">
+        <h3>💡 ¿Qué puedes hacer offline?</h3>
+        <ul>
+          <li>Ver la página de inicio (App Shell cacheada)</li>
+          <li>Navegar por secciones descargadas anteriormente</li>
+          <li>Usar el gestor de tareas (datos locales)</li>
+          <li>Ver imágenes cacheadas</li>
+          <li>Acceder a funciones sincronizadas localmente</li>
+          <li>Guardar cambios temporales hasta que vuelva la conexión</li>
+          <li>Consultar datos que ya habías descargado</li>
+          <li>Usar todas las funciones básicas de la aplicación</li>
+        </ul>
+      </div>
+
+      <div class="offline-faq">
+        <h3>❓ Preguntas Frecuentes</h3>
+        
+        <div class="faq-item">
+          <div class="faq-question">¿Perderé mis datos?</div>
+          <div class="faq-answer">No. Los datos se guardan localmente y se sincronizarán cuando recuperes la conexión.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">¿Cuánto tiempo puedo usar la app sin conexión?</div>
+          <div class="faq-answer">Indefinidamente. Todo el contenido cacheado está disponible mientras uses el navegador.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">¿Qué pasa si actualizo la página sin conexión?</div>
+          <div class="faq-answer">La app continuará funcionando con los recursos en caché. Este es el poder de las PWA.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">¿Cómo sé cuándo vuelva la conexión?</div>
+          <div class="faq-answer">Recibirás una notificación automática y la app se recargará para sincronizar cambios.</div>
+        </div>
+      </div>
+
+      <div class="footer-info">
+        <p>🌐 Progressive Web App - Funciona en cualquier dispositivo</p>
+        <p style="margin-top: 0.5rem;">Versión 1.0.0 | © 2025</p>
+      </div>
     </div>
   </div>
 
-<script>
-  function enterAppOffline() {
-    // Ir a la app (index.html está cacheado)
-    window.location.href = '/';
-  }
+  <script>
+    function enterAppOffline() {
+      window.location.href = '/';
+    }
 
-  function tryReload() {
-    window.location.reload();
-  }
-
-  // Detectar cuando vuelva la conexión
-  window.addEventListener('online', () => {
-    const message = document.createElement('div');
-    message.textContent = '✅ ¡Conexión recuperada! Recargando...';
-    message.style.cssText = `
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #4ade80;
-      color: #222;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      font-weight: bold;
-      z-index: 1000;
-      animation: slideIn 0.3s ease-out;
-    `;
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
+    function tryReload() {
       window.location.reload();
-    }, 1500);
-  });
-</script>
+    }
+
+    window.addEventListener('online', () => {
+      const message = document.createElement('div');
+      message.textContent = '✅ ¡Conexión recuperada! Recargando...';
+      message.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #4ade80;
+        color: #222;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: bold;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+      `;
+      document.body.appendChild(message);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    });
+  </script>
 </body>
 </html>

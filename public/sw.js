@@ -187,7 +187,11 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         if (request.destination === 'document') {
-          // Sin internet: mostrar offline.html
+          // Si la petición es a / o /index.html, servir el cache de la app
+          if (request.url.endsWith('/') || request.url.endsWith('/index.html')) {
+            return caches.match('/') || caches.match('/index.html');
+          }
+          // Para otros documentos, mostrar offline.html
           console.log('[SW] 📴 Sin conexión, mostrando offline.html');
           return caches.match('/offline.html') ||
                  new Response('Offline');
