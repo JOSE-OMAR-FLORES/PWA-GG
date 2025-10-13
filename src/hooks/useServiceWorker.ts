@@ -35,50 +35,35 @@ export const useServiceWorker = () => {
     }
   }, [])
 
-  const registerServiceWorker = async () => {
-    try {
-      console.log('🔄 Registrando Service Worker personalizado...')
-      setSwStatus('loading')
-      
-const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
+ const registerServiceWorker = async () => {
+  try {
+    console.log('🔄 [HOOK] Verificando registro de Service Worker...')
+    setSwStatus('loading')
+    
+    // El SW ya fue registrado en index.html
+    // Solo verificamos que esté ready
+    const registration = await navigator.serviceWorker.ready
+    
+    console.log('✅ [HOOK] Service Worker ya estaba registrado:', registration.scope)
+    
+    if (registration.waiting) {
+      console.log('📦 [HOOK] Hay actualización pendiente')
+      setUpdateState({
+        updateAvailable: true,
+        registration
       })
-      
-      console.log('✅ Service Worker registrado:', registration.scope)
-      
-      // Manejar actualizaciones
-      registration.addEventListener('updatefound', () => {
-        console.log('🔄 Nueva versión del Service Worker encontrada')
-        const newWorker = registration.installing
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('📦 Nueva versión instalada, actualización disponible')
-              setUpdateState({
-                updateAvailable: true,
-                registration
-              })
-            }
-          })
-        }
-      })
-      
-      // Escuchar cuando el SW toma control
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('🚀 Service Worker tomó control, recargando página...')
-        window.location.reload()
-      })
-      
-      if (registration) {
-        console.log('✅ Service Worker registrado exitosamente')
-        setSwStatus('ready')
-      }
-
-    } catch (error) {
-      console.error('❌ Error registrando Service Worker:', error)
-      setSwStatus('error')
     }
+
+    if (registration) {
+      console.log('✅ [HOOK] Service Worker verificado exitosamente')
+      setSwStatus('ready')
+    }
+
+  } catch (error) {
+    console.error('❌ [HOOK] Error verificando Service Worker:', error)
+    setSwStatus('error')
   }
+}
 
   const updateServiceWorker = () => {
     if (updateState.registration) {
