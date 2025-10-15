@@ -50,7 +50,8 @@ self.addEventListener('install', event => {
       caches.open(CACHE_NETWORK)
     ])
   );
-  self.skipWaiting();
+  // NO usar skipWaiting aquí para evitar recargas infinitas
+  // self.skipWaiting();
 });
 
 // ===============================

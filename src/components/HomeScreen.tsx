@@ -3,6 +3,7 @@ import OfflineForm from './OfflineForm';
 import PWAInfo from './PWAInfo';
 import ServiceWorkerInfo from './ServiceWorkerInfo';
 import CacheDebugPanel from './CacheDebugPanel';
+import { PushNotifications } from './PushNotifications';
 import './HomeScreen.css';
 
 export const HomeScreen: React.FC = () => {
@@ -32,6 +33,13 @@ export const HomeScreen: React.FC = () => {
 
       {/* Service Worker Info */}
       <ServiceWorkerInfo />
+
+      {/* Push Notifications */}
+      <section style={{ marginTop: '2rem' }}>
+        <div className="container">
+          <PushNotifications />
+        </div>
+      </section>
 
       {/* Features Grid */}
       <section className="features-section">
