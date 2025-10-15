@@ -1,4 +1,24 @@
-// Firebase Cloud Messaging Service Worker
+// Script para generar firebase-messaging-sw.js con variables de entorno
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Leer variables de entorno
+const config = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY || '',
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.VITE_FIREBASE_APP_ID || '',
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || ''
+};
+
+// Template del Service Worker
+const swTemplate = `// Firebase Cloud Messaging Service Worker
 // ⚠️ Este archivo es generado automáticamente por scripts/generate-firebase-sw.js
 // NO EDITAR MANUALMENTE
 
@@ -6,15 +26,7 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
 // Firebase configuration
-const firebaseConfig = {
-  "apiKey": "",
-  "authDomain": "",
-  "projectId": "",
-  "storageBucket": "",
-  "messagingSenderId": "",
-  "appId": "",
-  "measurementId": ""
-};
+const firebaseConfig = ${JSON.stringify(config, null, 2)};
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -51,3 +63,10 @@ self.addEventListener('notificationclick', (event) => {
     clients.openWindow(event.notification.data?.url || '/')
   );
 });
+`;
+
+// Escribir el archivo
+const outputPath = path.join(__dirname, '..', 'public', 'firebase-messaging-sw.js');
+fs.writeFileSync(outputPath, swTemplate, 'utf-8');
+
+console.log('✅ firebase-messaging-sw.js generado exitosamente');

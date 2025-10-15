@@ -160,17 +160,19 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
 
+    // ⚠️ NOTA: En producción, estas claves deberían cargarse desde variables de entorno
+    // Este archivo es solo para testing manual
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKGqXjq0VgkaX6Y2qx5ObiuW6-pguGVc",
-      authDomain: "pwa-jofm.firebaseapp.com",
-      projectId: "pwa-jofm",
-      storageBucket: "pwa-jofm.firebasestorage.app",
-      messagingSenderId: "1057573351015",
-      appId: "1:1057573351015:web:334f4d38c4304ded16eec2",
-      measurementId: "G-YE27K9L85E"
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
     };
 
-    const VAPID_KEY = "BNzePn1InD2ucfHIBzmVkNT2yjfDn_zBRzaOBY_VxMXZFV_JUXmwfrueX9HnGNt4aNKHOOXriFuB7vyHuerYPds";
+    const VAPID_KEY = "YOUR_VAPID_KEY_HERE";
 
     const app = initializeApp(firebaseConfig);
     let messaging = null;

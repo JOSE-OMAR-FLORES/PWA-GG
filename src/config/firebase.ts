@@ -3,18 +3,19 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // Your web app's Firebase configuration
+// ⚠️ Usando variables de entorno para mayor seguridad
 const firebaseConfig = {
-  apiKey: "AIzaSyBBKGqXjq0VgkaX6Y2qx5ObiuW6-pguGVc",
-  authDomain: "pwa-jofm.firebaseapp.com",
-  projectId: "pwa-jofm",
-  storageBucket: "pwa-jofm.firebasestorage.app",
-  messagingSenderId: "1057573351015",
-  appId: "1:1057573351015:web:334f4d38c4304ded16eec2",
-  measurementId: "G-YE27K9L85E"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // VAPID Key (Web Push certificate)
-export const VAPID_KEY = "BNzePn1InD2ucfHIBzmVkNT2yjfDn_zBRzaOBY_VxMXZFV_JUXmwfrueX9HnGNt4aNKHOOXriFuB7vyHuerYPds";
+export const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
