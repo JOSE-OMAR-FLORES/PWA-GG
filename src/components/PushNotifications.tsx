@@ -14,6 +14,30 @@ export const PushNotifications: React.FC = () => {
 
   const [showToken, setShowToken] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
+
+  // Detectar información del dispositivo
+  React.useEffect(() => {
+    const info = {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      isMobile: /Android|iPhone|iPad|iPod/i.test(navigator.userAgent),
+      isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
+      isAndroid: /Android/i.test(navigator.userAgent),
+      hasNotification: 'Notification' in window,
+      hasSW: 'serviceWorker' in navigator,
+      permission: Notification.permission
+    };
+    
+    setDebugInfo(JSON.stringify(info, null, 2));
+    console.log('Información del dispositivo:', info);
+    
+    // Mostrar alerta específica para iOS
+    if (info.isIOS) {
+      console.warn('⚠️ iOS detectado: Las notificaciones web push NO están soportadas en Safari iOS');
+    }
+  }, []);
 
   const copyToClipboard = () => {
     if (token) {
@@ -142,6 +166,37 @@ export const PushNotifications: React.FC = () => {
           <li>Escribe tu mensaje y en "Send test message" pega tu token FCM</li>
           <li>¡Recibe la notificación! 🎉</li>
         </ol>
+      </div>
+
+      {/* Debug Info Panel */}
+      <div className="debug-panel">
+        <button 
+          className="btn btn-debug"
+          onClick={() => setShowDebug(!showDebug)}
+        >
+          {showDebug ? '🙈 Ocultar Info Debug' : '🔍 Mostrar Info Debug'}
+        </button>
+        
+        {showDebug && (
+          <div className="debug-info">
+            <h4>📱 Información del Dispositivo:</h4>
+            <pre>{debugInfo}</pre>
+            <div className="debug-tips">
+              <h4>💡 Solución de Problemas:</h4>
+              <ul>
+                <li><strong>iOS (iPhone/iPad):</strong> Las notificaciones web push NO están soportadas en Safari. Solo funcionan en apps nativas.</li>
+                <li><strong>Android Chrome:</strong> Debe funcionar correctamente. Si no funciona, asegúrate de que:
+                  <ul>
+                    <li>Estás usando HTTPS (o localhost)</li>
+                    <li>El Service Worker está registrado</li>
+                    <li>Has instalado la PWA en tu dispositivo</li>
+                  </ul>
+                </li>
+                <li><strong>Desktop:</strong> Funciona en Chrome, Edge, Firefox y Opera</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
