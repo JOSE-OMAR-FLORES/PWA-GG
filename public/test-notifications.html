@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test de Notificaciones Push</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+    }
+    .status {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin-bottom: 1.5rem;
+    }
+    .status h3 {
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .status-item:last-child {
+      border-bottom: none;
+    }
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .badge.success { background: #10b981; }
+    .badge.error { background: #ef4444; }
+    .badge.warning { background: #f59e0b; }
+    button {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+    .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+    .btn-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+    .log {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+    }
+    .log-entry {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      border-left: 3px solid #3b82f6;
+      padding-left: 1rem;
+    }
+    .token-box {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      word-break: break-all;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔔 Test de Notificaciones Push</h1>
+    
+    <div class="status">
+      <h3>📊 Estado del Sistema</h3>
+      <div class="status-item">
+        <span>Service Worker:</span>
+        <span class="badge" id="sw-status">Verificando...</span>
+      </div>
+      <div class="status-item">
+        <span>Notificaciones:</span>
+        <span class="badge" id="notif-status">Verificando...</span>
+      </div>
+      <div class="status-item">
+        <span>Push API:</span>
+        <span class="badge" id="push-status">Verificando...</span>
+      </div>
+      <div class="status-item">
+        <span>Firebase SW:</span>
+        <span class="badge" id="firebase-sw-status">Verificando...</span>
+      </div>
+    </div>
+
+    <div class="status">
+      <h3>🔧 Acciones</h3>
+      <button class="btn-primary" onclick="checkPermission()">
+        🔍 Verificar Permisos
+      </button>
+      <button class="btn-success" onclick="requestPermission()">
+        🔔 Solicitar Permiso
+      </button>
+      <button class="btn-warning" onclick="testLocalNotification()">
+        🚀 Notificación de Prueba
+      </button>
+    </div>
+
+    <div class="status" id="token-section" style="display: none;">
+      <h3>🔑 Token FCM</h3>
+      <div class="token-box" id="token-display"></div>
+      <button class="btn-primary" onclick="copyToken()">📋 Copiar Token</button>
+    </div>
+
+    <div class="status">
+      <h3>📝 Registro de Eventos</h3>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+
+    // ⚠️ NOTA: En producción, estas claves deberían cargarse desde variables de entorno
+    // Este archivo es solo para testing manual
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
+    };
+
+    const VAPID_KEY = "YOUR_VAPID_KEY_HERE";
+
+    const app = initializeApp(firebaseConfig);
+    let messaging = null;
+    let currentToken = null;
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+      logDiv.insertBefore(entry, logDiv.firstChild);
+    }
+
+    function updateStatus(id, status, text) {
+      const badge = document.getElementById(id);
+      badge.className = `badge ${status}`;
+      badge.textContent = text;
+    }
+
+    // Verificar capacidades del navegador
+    async function checkCapabilities() {
+      // Service Worker
+      if ('serviceWorker' in navigator) {
+        updateStatus('sw-status', 'success', '✅ Soportado');
+        log('✅ Service Worker soportado');
+      } else {
+        updateStatus('sw-status', 'error', '❌ No soportado');
+        log('❌ Service Worker NO soportado');
+      }
+
+      // Notifications
+      if ('Notification' in window) {
+        updateStatus('notif-status', 'success', '✅ Soportado');
+        log('✅ Notifications API soportada');
+      } else {
+        updateStatus('notif-status', 'error', '❌ No soportado');
+        log('❌ Notifications API NO soportada');
+      }
+
+      // Push API
+      if ('PushManager' in window) {
+        updateStatus('push-status', 'success', '✅ Soportado');
+        log('✅ Push API soportada');
+      } else {
+        updateStatus('push-status', 'error', '❌ No soportado');
+        log('❌ Push API NO soportada');
+      }
+
+      // Verificar Firebase SW
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        const firebaseSW = registrations.find(reg => 
+          reg.active && reg.active.scriptURL.includes('firebase-messaging-sw.js')
+        );
+        
+        if (firebaseSW) {
+          updateStatus('firebase-sw-status', 'success', '✅ Registrado');
+          log('✅ Firebase Messaging SW registrado');
+        } else {
+          updateStatus('firebase-sw-status', 'warning', '⚠️ No encontrado');
+          log('⚠️ Firebase Messaging SW no encontrado');
+        }
+      } catch (error) {
+        updateStatus('firebase-sw-status', 'error', '❌ Error');
+        log('❌ Error verificando Firebase SW: ' + error.message);
+      }
+    }
+
+    window.checkPermission = function() {
+      const permission = Notification.permission;
+      log(`🔍 Permiso actual: ${permission}`);
+      
+      if (permission === 'granted') {
+        log('✅ Permiso CONCEDIDO');
+      } else if (permission === 'denied') {
+        log('❌ Permiso DENEGADO');
+      } else {
+        log('⏳ Permiso PENDIENTE');
+      }
+    };
+
+    window.requestPermission = async function() {
+      try {
+        log('📝 Solicitando permiso...');
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'granted') {
+          log('✅ Permiso concedido!');
+          
+          // Inicializar messaging si aún no está
+          if (!messaging) {
+            messaging = getMessaging(app);
+          }
+          
+          // Obtener token
+          log('🔑 Obteniendo token FCM...');
+          const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+          
+          if (token) {
+            currentToken = token;
+            log('✅ Token FCM obtenido!');
+            document.getElementById('token-display').textContent = token;
+            document.getElementById('token-section').style.display = 'block';
+          } else {
+            log('❌ No se pudo obtener el token');
+          }
+        } else {
+          log('❌ Permiso denegado');
+        }
+      } catch (error) {
+        log('❌ Error: ' + error.message);
+      }
+    };
+
+    window.testLocalNotification = function() {
+      if (Notification.permission === 'granted') {
+        log('🚀 Enviando notificación de prueba...');
+        
+        const notification = new Notification('🎉 Notificación de Prueba', {
+          body: 'Esta es una notificación de prueba desde la página de test',
+          icon: '/icons/icon-192x192.png',
+          badge: '/icons/icon-96x96.png',
+          vibrate: [200, 100, 200],
+          tag: 'test-notification',
+          requireInteraction: false
+        });
+
+        notification.onclick = () => {
+          log('👆 Click en notificación detectado');
+          window.focus();
+          notification.close();
+        };
+
+        log('✅ Notificación enviada');
+      } else {
+        log('❌ Permiso no concedido. Solicita permiso primero.');
+      }
+    };
+
+    window.copyToken = function() {
+      if (currentToken) {
+        navigator.clipboard.writeText(currentToken);
+        log('📋 Token copiado al portapapeles');
+      }
+    };
+
+    // Inicializar al cargar
+    checkCapabilities();
+    checkPermission();
+  </script>
+</body>
+</html>
