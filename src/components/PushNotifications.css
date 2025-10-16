@@ -255,6 +255,81 @@
   }
 }
 
+/* Debug Panel */
+.debug-panel {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.btn-debug {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btn-debug:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.debug-info {
+  margin-top: 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+  animation: slideIn 0.3s ease-out;
+}
+
+.debug-info h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #fbbf24;
+}
+
+.debug-info pre {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #10b981;
+}
+
+.debug-tips ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.debug-tips ul li {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.debug-tips ul li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #fbbf24;
+}
+
+.debug-tips ul ul {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+}
+
+.debug-tips ul ul li::before {
+  content: "•";
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .push-notifications-container {
